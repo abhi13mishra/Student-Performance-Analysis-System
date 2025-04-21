@@ -1,0 +1,97 @@
+<script>
+   function  createStudentManager(){
+    let students = {};
+    return{
+        addStudent(name, subjects = {}){
+            students[name] = {...subjects};
+        },
+
+        updateScore(name, subject, score){
+            if(students[name]){
+               students[name][subject] = score
+            }
+        },
+
+        getStudentDetails(name){
+           return students[name] ? {name, subjects: students[name]}: "student not found";
+        },
+
+        addSubject(name, subject, score){
+              if(students[name]){
+                students[name][subject] = score
+              }
+        },
+
+        calculateAverageScore(){
+            return Object.entries(students).map(([name, subject]) =>{
+                let scores = Object.values(subjects);
+                let avg = scores.reduce((a,b)=> a+b , 0)/scores.length;
+                return {name, average: avg};
+            })
+        },
+
+        getTopPerFormers(){
+            return this.calculateAverageScore().filter(student => student.average > 85)
+        },
+
+        getDifficultSubjects(){
+           let subjectScores = {};
+           Object.Values(students).forEach(subjects => {
+            Object.entries(subjects).forEach(([subject, score]) => {
+                if(!subjectScores[subject]) subjectScores[subject] = [];
+                subjectScores[subject].push(score)
+            })
+           })
+           return Object.entries(subjectScores)
+           .filter(([subject, scores]) => {
+             let countBelow40 = scores.filter(score => score < 40).length;
+             return countBelow40 >(scores.length/2)
+           })
+           .map(([subject]) => subject)
+    },
+
+    getFailingStudents(){
+        return Object.entries(students).filter(([name, subjects]) => {
+            return Object.values(students).some(score => score < 35)
+        }).map(([name]) => name)
+    },
+
+    getSubjectFrequencyMap(){
+        let frequencyMap = {};
+        Object.values(students).forEach(students =>{
+            Object.keys(subjects).forEach(subject => {
+                frequencyMap[subject]=(frequencyMap[subject] || 0)+1;
+            })
+        })
+        return frequencyMap;
+    }, 
+
+    getSortedStudents(sortBy ="name"){
+      let studentsArray = Object.entries(students).map(([name, subjects]) =>({
+         name,
+         subjects,
+         average : Object.values(subjects).reduce((a,b) => a+b, 0)/Object.values(subjects).length
+      }))
+      return studentsArray.sort((a,b)=>{
+        if(sortBy == "average"){
+           return b.average-a.average
+        }else{
+            return a.name.localeCompare(b.name)
+        }
+      })
+    }
+  }
+}
+
+let manager = createStudentManager();
+manager.addStudent("Abhishek", {math: 40, science: 80});
+manager.addSubject("Abhishek","english", 85);
+console.log(manager.getStudentDetails("Abhishek"))
+console.log(manager.calculateAverageScore())
+console.log(manager.getTopPerFormers())
+console.log(manager.getDifficultSubjects())
+console.log(manager.getFailingStudents())
+console.log(manager.getSubjectFrequencyMap())
+console.log(manager.getSortedStudents("average"))
+//manager.updateScore
+</script>
